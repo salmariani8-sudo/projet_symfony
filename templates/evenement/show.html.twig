@@ -1,0 +1,206 @@
+{% extends 'base.html.twig' %}
+{% block title %}{{ evenement.titre }} — EventSpot{% endblock %}
+
+{% block body %}
+
+<!-- Page Header -->
+<div class="es-page-header">
+    <div class="container">
+        <h1 data-aos="fade-up">{{ evenement.titre }}</h1>
+        <p data-aos="fade-up" data-aos-delay="100">
+            <i class="bi bi-geo-alt"></i>
+            {{ evenement.lieu ? evenement.lieu.nom ~ ', ' ~ evenement.lieu.ville : '-' }}
+            &nbsp;&nbsp;
+            <i class="bi bi-calendar3"></i>
+            {{ evenement.dateDebut ? evenement.dateDebut|date('d/m/Y') : '-' }}
+        </p>
+    </div>
+</div>
+
+<section class="es-section">
+<div class="container">
+
+    <a href="{{ path('app_evenement_index') }}" class="text-decoration-none mb-4 d-inline-block"
+       style="color:var(--accent-color,#f82249);">
+        <i class="bi bi-arrow-left"></i> Retour à la liste
+    </a>
+
+    <div class="row g-4 mt-1">
+
+        <!-- Contenu principal -->
+        <div class="col-lg-8" data-aos="fade-up">
+            <div class="es-card card">
+
+                <!-- Image bannière -->
+                {% if evenement.imageName %}
+                    <img src="{{ asset('uploads/evenements/' ~ evenement.imageName) }}"
+                         alt="{{ evenement.titre }}"
+                         style="width:100%; max-height:420px; object-fit:cover;">
+                {% else %}
+                    <div class="es-placeholder" style="height:250px;">
+                        {% if evenement.categorie == 'concert' %}🎵
+                        {% elseif evenement.categorie == 'conference' %}🎤
+                        {% elseif evenement.categorie == 'atelier' %}🔧
+                        {% elseif evenement.categorie == 'meetup' %}👥
+                        {% else %}📚{% endif %}
+                    </div>
+                {% endif %}
+
+                <div class="card-body p-4">
+                    <!-- Badges catégorie + statut -->
+                    <div class="mb-3 d-flex flex-wrap gap-2">
+                        <span class="badge text-white rounded-pill" style="background:var(--accent-color,#f82249); font-size:12px; padding:6px 14px;">
+                            {% if evenement.categorie == 'concert' %}🎵 Concert
+                            {% elseif evenement.categorie == 'conference' %}🎤 Conférence
+                            {% elseif evenement.categorie == 'atelier' %}🔧 Atelier
+                            {% elseif evenement.categorie == 'meetup' %}👥 Meetup
+                            {% else %}📚 Formation{% endif %}
+                        </span>
+                        {% if evenement.statut == 'publie' %}
+                            <span class="badge bg-success" style="font-size:12px; padding:6px 14px;">🟢 Publié</span>
+                        {% elseif evenement.statut == 'complet' %}
+                            <span class="badge bg-danger" style="font-size:12px; padding:6px 14px;">🔴 Complet</span>
+                        {% elseif evenement.statut == 'annule' %}
+                            <span class="badge bg-dark" style="font-size:12px; padding:6px 14px;">⚫ Annulé</span>
+                        {% else %}
+                            <span class="badge bg-secondary" style="font-size:12px; padding:6px 14px;">📝 Brouillon</span>
+                        {% endif %}
+                    </div>
+
+                    <!-- Tags -->
+                    <div class="mb-3">
+                        {% for tag in evenement.tags %}
+                            <span class="badge-tag" style="background-color:{{ tag.couleur }}; font-size:12px;">{{ tag.nom }}</span>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Date création -->
+                    <p class="text-muted small">
+                        <i class="bi bi-clock"></i> Publié {{ evenement.dateCreation|time_ago }}
+                    </p>
+
+                    <!-- Description -->
+                    <p class="lead mt-3" style="line-height:1.8; color:#444;">
+                        {{ evenement.description }}
+                    </p>
+
+                    <!-- Boutons modifier / supprimer -->
+                    <div class="d-flex gap-2 mt-4 pt-3 border-top">
+                        {% if is_granted('IS_AUTHENTICATED_REMEMBERED') and is_granted('EVENEMENT_EDIT', evenement) %}
+                            <a href="{{ path('app_evenement_edit', {id: evenement.id}) }}"
+                               class="btn btn-warning btn-sm">
+                                <i class="bi bi-pencil"></i> Modifier
+                            </a>
+                        {% endif %}
+                        {% if is_granted('IS_AUTHENTICATED_REMEMBERED') and is_granted('EVENEMENT_DELETE', evenement) %}
+                            <form method="post" action="{{ path('app_evenement_delete', {id: evenement.id}) }}"
+                                  onsubmit="return confirm('Supprimer cet événement définitivement ?')">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ evenement.id) }}">
+                                <button type="submit" class="btn btn-danger btn-sm">
+                                    <i class="bi bi-trash"></i> Supprimer
+                                </button>
+                            </form>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sidebar informations -->
+        <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+            <div class="es-card card">
+                <div class="card-body p-4">
+                    <h5 class="fw-bold mb-4" style="border-bottom:2px solid var(--accent-color,#f82249); padding-bottom:10px;">
+                        Informations
+                    </h5>
+
+                    <div class="row schedule-item mb-3">
+                        <div class="col-12">
+                            <i class="bi bi-geo-alt" style="color:var(--accent-color,#f82249);"></i>
+                            <strong> Lieu</strong><br>
+                            <span class="text-muted ms-3">
+                                {{ evenement.lieu ? evenement.lieu.nom ~ ', ' ~ evenement.lieu.ville : '-' }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <i class="bi bi-calendar3" style="color:var(--accent-color,#f82249);"></i>
+                        <strong> Début</strong><br>
+                        <span class="text-muted ms-3">
+                            {{ evenement.dateDebut ? evenement.dateDebut|date('d/m/Y à H:i') : '-' }}
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <i class="bi bi-calendar-check" style="color:var(--accent-color,#f82249);"></i>
+                        <strong> Fin</strong><br>
+                        <span class="text-muted ms-3">
+                            {{ evenement.dateFin ? evenement.dateFin|date('d/m/Y à H:i') : '-' }}
+                        </span>
+                    </div>
+
+                    <div class="mb-3">
+                        <i class="bi bi-tag" style="color:var(--accent-color,#f82249);"></i>
+                        <strong> Prix</strong>
+                        <span class="fw-bold ms-2" style="color:var(--accent-color,#f82249); font-size:1.1rem;">
+                            {{ evenement.prix|price_format }}
+                        </span>
+                    </div>
+
+                    <div class="mb-2">
+                        <i class="bi bi-people" style="color:var(--accent-color,#f82249);"></i>
+                        <strong> Places</strong>
+                        <span class="ms-2">{{ evenement.inscriptions|length }} / {{ evenement.capaciteMax }}</span>
+                    </div>
+
+                    <!-- Jauge de remplissage -->
+                    {% set pct = evenement.capaciteMax > 0
+                        ? (evenement.inscriptions|length / evenement.capaciteMax * 100)|round
+                        : 0 %}
+                    <div class="progress mb-2" style="height:8px; border-radius:10px;">
+                        <div class="progress-bar
+                            {% if pct >= 100 %}bg-danger
+                            {% elseif pct >= 80 %}bg-warning
+                            {% else %}bg-success{% endif %}"
+                             style="width:{{ pct }}%; border-radius:10px;"></div>
+                    </div>
+                    <p class="text-muted small mb-3">{{ pct }}% des places occupées</p>
+
+                    <!-- Badge capacité (extension Twig) -->
+                    <div class="mb-4">
+                        {{ capacity_badge(evenement.inscriptions|length, evenement.capaciteMax)|raw }}
+                    </div>
+
+                    <!-- Bouton inscription -->
+                    {% if evenement.statut == 'annule' %}
+                        <button class="btn btn-dark w-100" disabled>
+                            <i class="bi bi-x-circle"></i> Événement annulé
+                        </button>
+                    {% elseif evenement.statut == 'complet' %}
+                        <button class="btn btn-secondary w-100" disabled>
+                            <i class="bi bi-slash-circle"></i> Complet
+                        </button>
+                    {% elseif not is_granted('ROLE_USER') %}
+                        <a href="{{ path('app_login') }}" class="buy-btn d-block text-center w-100">
+                            <i class="bi bi-box-arrow-in-right"></i> Connexion requise
+                        </a>
+                    {% elseif dejaInscrit %}
+                        <button class="btn btn-success w-100" disabled>
+                            <i class="bi bi-check-circle"></i> Déjà inscrit ✓
+                        </button>
+                    {% else %}
+                        <a href="{{ path('app_evenement_inscription', {id: evenement.id}) }}"
+                           class="buy-btn d-block text-center w-100" style="padding:12px;">
+                            <i class="bi bi-ticket-perforated"></i> S'inscrire maintenant
+                        </a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+</section>
+
+{% endblock %}

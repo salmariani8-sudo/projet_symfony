@@ -1,0 +1,46 @@
+{% extends 'base.html.twig' %}
+{% block title %}Inscription — EventSpot{% endblock %}
+
+{% block body %}
+
+<div class="es-page-header">
+    <div class="container">
+        <h1><i class="bi bi-person-plus"></i> Créer un compte</h1>
+    </div>
+</div>
+
+<section class="es-section">
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-lg-5 col-md-7" data-aos="fade-up">
+    <div class="es-card card">
+        <div class="card-body p-5">
+            <h4 class="fw-bold text-center mb-4">Rejoignez EventSpot</h4>
+
+            {{ form_start(form) }}
+
+            {{ form_row(form.email) }}
+            {{ form_row(form.pseudo) }}
+            {{ form_row(form.plainPassword) }}
+
+            <button class="buy-btn w-100 mt-2" type="submit" style="padding:14px; font-size:15px;">
+                <i class="bi bi-check-circle"></i> Créer mon compte
+            </button>
+
+            {{ form_end(form) }}
+
+            <hr class="my-4">
+            <p class="text-center mb-0 text-muted">
+                Déjà un compte ?
+                <a href="{{ path('app_login') }}" style="color:var(--accent-color,#f82249); font-weight:600;">
+                    Se connecter
+                </a>
+            </p>
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</section>
+
+{% endblock %}

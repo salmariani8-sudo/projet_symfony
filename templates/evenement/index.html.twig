@@ -1,0 +1,162 @@
+{% extends 'base.html.twig' %}
+{% block title %}Événements — EventSpot{% endblock %}
+
+{% block body %}
+
+<div class="es-page-header">
+    <div class="container">
+        <h1 data-aos="fade-up"><i class="bi bi-calendar-event"></i> Tous les Événements</h1>
+        <p data-aos="fade-up" data-aos-delay="100">Trouvez l'événement qui vous correspond</p>
+    </div>
+</div>
+
+<section class="es-section">
+<div class="container">
+
+    <!-- Formulaire de recherche -->
+    <div class="card border-0 shadow-sm mb-4 rounded-3" data-aos="fade-up">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-3"><i class="bi bi-search"></i> Filtrer les événements</h5>
+            <form method="get" action="{{ path('app_evenement_index') }}">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <input type="text" name="q" class="form-control"
+                               placeholder="Titre..." value="{{ filtres.q ?? '' }}">
+                    </div>
+                    <div class="col-md-3">
+                        <select name="categorie" class="form-select">
+                            <option value="">Toutes catégories</option>
+                            <option value="conference" {{ (filtres.categorie ?? '') == 'conference' ? 'selected' }}>🎤 Conférence</option>
+                            <option value="atelier"    {{ (filtres.categorie ?? '') == 'atelier'    ? 'selected' }}>🔧 Atelier</option>
+                            <option value="meetup"     {{ (filtres.categorie ?? '') == 'meetup'     ? 'selected' }}>👥 Meetup</option>
+                            <option value="formation"  {{ (filtres.categorie ?? '') == 'formation'  ? 'selected' }}>📚 Formation</option>
+                            <option value="concert"    {{ (filtres.categorie ?? '') == 'concert'    ? 'selected' }}>🎵 Concert</option>
+                        </select>
+                    </div>
+                    <div class="col-md-3">
+                        <input type="text" name="ville" class="form-control"
+                               placeholder="Ville..." value="{{ filtres.ville ?? '' }}">
+                    </div>
+                    <div class="col-md-3 d-flex gap-2">
+                        <button type="submit" class="buy-btn flex-fill">
+                            <i class="bi bi-search"></i> Filtrer
+                        </button>
+                        <a href="{{ path('app_evenement_index') }}" class="btn btn-outline-secondary flex-fill">
+                            Réinitialiser
+                        </a>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Résultats + bouton créer -->
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted mb-0">
+            <strong>{{ pagination.getTotalItemCount() }}</strong> événement(s) trouvé(s)
+        </p>
+        {% if is_granted('ROLE_ORGANISATEUR') %}
+            <a href="{{ path('app_evenement_new') }}" class="buy-btn">
+                <i class="bi bi-plus-circle"></i> Créer un événement
+            </a>
+        {% endif %}
+    </div>
+
+    <!-- Tableau -->
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden" data-aos="fade-up">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead style="background:var(--heading-color,#2c2c2c); color:#fff;">
+                    <tr>
+                        <th style="width:60px;"></th>
+                        <th>{{ knp_pagination_sortable(pagination, 'Titre', 'e.titre') }}</th>
+                        <th>Catégorie</th>
+                        <th>{{ knp_pagination_sortable(pagination, 'Date', 'e.dateDebut') }}</th>
+                        <th>Lieu</th>
+                        <th>{{ knp_pagination_sortable(pagination, 'Prix', 'e.prix') }}</th>
+                        <th>Statut</th>
+                        <th>Tags</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                {% for e in pagination %}
+                    <tr>
+                        <td class="align-middle ps-3">
+                            {% if e.imageName %}
+                                <img src="{{ asset('uploads/evenements/' ~ e.imageName) }}"
+                                     style="width:48px; height:38px; object-fit:cover; border-radius:5px;" alt="">
+                            {% else %}
+                                <div style="width:48px; height:38px; background:#f4f4f4; border-radius:5px; display:flex; align-items:center; justify-content:center; font-size:16px;">
+                                    {% if e.categorie == 'concert' %}🎵
+                                    {% elseif e.categorie == 'conference' %}🎤
+                                    {% elseif e.categorie == 'atelier' %}🔧
+                                    {% elseif e.categorie == 'meetup' %}👥
+                                    {% else %}📚{% endif %}
+                                </div>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle fw-semibold">{{ e.titre }}</td>
+                        <td class="align-middle">
+                            <span class="badge text-white rounded-pill" style="background:var(--accent-color,#f82249); font-size:11px;">
+                                {% if e.categorie == 'concert' %}🎵 Concert
+                                {% elseif e.categorie == 'conference' %}🎤 Conférence
+                                {% elseif e.categorie == 'atelier' %}🔧 Atelier
+                                {% elseif e.categorie == 'meetup' %}👥 Meetup
+                                {% else %}📚 Formation{% endif %}
+                            </span>
+                        </td>
+                        <td class="align-middle text-muted small">
+                            {{ e.dateDebut ? e.dateDebut|date('d/m/Y') : '-' }}
+                        </td>
+                        <td class="align-middle text-muted small">
+                            {{ e.lieu ? e.lieu.ville : '-' }}
+                        </td>
+                        <td class="align-middle fw-semibold" style="color:var(--accent-color,#f82249);">
+                            {{ e.prix|price_format }}
+                        </td>
+                        <td class="align-middle">
+                            {% if e.statut == 'publie' %}
+                                <span class="badge bg-success">🟢 Publié</span>
+                            {% elseif e.statut == 'complet' %}
+                                <span class="badge bg-danger">🔴 Complet</span>
+                            {% elseif e.statut == 'annule' %}
+                                <span class="badge bg-dark">⚫ Annulé</span>
+                            {% else %}
+                                <span class="badge bg-secondary">📝 Brouillon</span>
+                            {% endif %}
+                        </td>
+                        <td class="align-middle">
+                            {% for tag in e.tags %}
+                                <span class="badge-tag" style="background-color:{{ tag.couleur }};">{{ tag.nom }}</span>
+                            {% endfor %}
+                        </td>
+                        <td class="align-middle">
+                            <a href="{{ path('app_evenement_show', {id: e.id}) }}"
+                               class="buy-btn" style="padding:6px 16px; font-size:12px;">
+                                Voir
+                            </a>
+                        </td>
+                    </tr>
+                {% else %}
+                    <tr>
+                        <td colspan="9" class="text-center text-muted py-5">
+                            <i class="bi bi-calendar-x fs-1 d-block mb-2"></i>
+                            Aucun événement trouvé.
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <!-- Pagination -->
+    <div class="d-flex justify-content-center mt-4">
+        {{ knp_pagination_render(pagination) }}
+    </div>
+
+</div>
+</section>
+
+{% endblock %}

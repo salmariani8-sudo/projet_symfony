@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Confirmation d'inscription — EventSpot</title>
+    <style>
+        body { font-family: 'Raleway', Arial, sans-serif; background:#f4f4f4; margin:0; padding:0; }
+        .wrapper { max-width:600px; margin:30px auto; background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 4px 20px rgba(0,0,0,.1); }
+        .header { background:linear-gradient(135deg,#1a1a2e,#f82249); padding:40px 30px; text-align:center; }
+        .header h1 { color:#fff; margin:0; font-size:26px; font-weight:800; letter-spacing:1px; }
+        .header p { color:rgba(255,255,255,.8); margin:8px 0 0; }
+        .body { padding:35px 30px; }
+        .body h2 { color:#2c2c2c; font-size:20px; margin-bottom:6px; }
+        .body p { color:#555; line-height:1.7; }
+        .info-box { background:#f8f8f8; border-left:4px solid #f82249; border-radius:6px; padding:18px 20px; margin:20px 0; }
+        .info-box .row { display:flex; margin-bottom:8px; }
+        .info-box .label { font-weight:700; color:#333; min-width:80px; }
+        .info-box .value { color:#555; }
+        .price { font-size:1.5rem; font-weight:800; color:#f82249; }
+        .cta { text-align:center; margin:28px 0 10px; }
+        .cta a { background:#f82249; color:#fff; padding:14px 36px; border-radius:6px; text-decoration:none; font-weight:700; font-size:15px; display:inline-block; }
+        .footer { background:#1a1a2e; padding:20px 30px; text-align:center; }
+        .footer p { color:rgba(255,255,255,.5); font-size:13px; margin:0; }
+        .footer a { color:rgba(255,255,255,.7); }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+    <div class="header">
+        <h1>🎫 EventSpot</h1>
+        <p>Votre plateforme d'événements</p>
+    </div>
+
+    <div class="body">
+        <h2>Bonjour {{ user.pseudo }} ! 👋</h2>
+        <p>Votre inscription est confirmée. Nous sommes ravis de vous accueillir !</p>
+
+        <div class="info-box">
+            <div class="row">
+                <span class="label">Événement</span>
+                <span class="value"><strong>{{ evenement.titre }}</strong></span>
+            </div>
+            <div class="row">
+                <span class="label">Date</span>
+                <span class="value">{{ evenement.dateDebut|date('d/m/Y à H:i') }}</span>
+            </div>
+            <div class="row">
+                <span class="label">Lieu</span>
+                <span class="value">
+                    {{ evenement.lieu ? evenement.lieu.nom ~ ', ' ~ evenement.lieu.ville : '-' }}
+                </span>
+            </div>
+            <div class="row">
+                <span class="label">Prix</span>
+                <span class="value price">
+                    {% if evenement.prix is null or evenement.prix == 0 %}
+                        Gratuit 🎉
+                    {% else %}
+                        {{ evenement.prix|number_format(2, ',', ' ') }} €
+                    {% endif %}
+                </span>
+            </div>
+        </div>
+
+        <p>Conservez bien cet email — il vous servira de confirmation pour l'événement.</p>
+
+        <div class="cta">
+            <a href="#">Voir mon inscription</a>
+        </div>
+    </div>
+
+    <div class="footer">
+        <p>&copy; {{ "now"|date("Y") }} EventSpot — <a href="#">Se désabonner</a></p>
+    </div>
+</div>
+</body>
+</html>

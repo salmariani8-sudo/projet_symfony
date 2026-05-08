@@ -1,0 +1,40 @@
+{% extends 'base.html.twig' %}
+{% block title %}Nouveau tag — EventSpot{% endblock %}
+
+{% block body %}
+
+<div class="es-page-header">
+    <div class="container">
+        <h1><i class="bi bi-tag-fill"></i> Nouveau tag</h1>
+    </div>
+</div>
+
+<section class="es-section">
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-lg-5" data-aos="fade-up">
+    <div class="es-card card">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-4" style="border-bottom:2px solid var(--accent-color,#f82249); padding-bottom:10px;">
+                Créer un tag
+            </h5>
+            {{ form_start(form) }}
+            {{ form_row(form.nom) }}
+            {{ form_row(form.couleur) }}
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="buy-btn flex-fill" style="padding:12px;">
+                    <i class="bi bi-check-circle"></i> Créer
+                </button>
+                <a href="{{ path('app_tag_index') }}" class="btn btn-outline-secondary flex-fill" style="padding:12px;">
+                    Annuler
+                </a>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</section>
+
+{% endblock %}

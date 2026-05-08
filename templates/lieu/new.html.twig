@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+{% block title %}Nouveau lieu — EventSpot{% endblock %}
+
+{% block body %}
+
+<div class="es-page-header">
+    <div class="container">
+        <h1><i class="bi bi-plus-circle"></i> Nouveau lieu</h1>
+    </div>
+</div>
+
+<section class="es-section">
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-lg-6" data-aos="fade-up">
+    <div class="es-card card">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-4" style="border-bottom:2px solid var(--accent-color,#f82249); padding-bottom:10px;">
+                Informations du lieu
+            </h5>
+            {{ form_start(form) }}
+            {{ form_row(form.nom) }}
+            {{ form_row(form.adresse) }}
+            {{ form_row(form.ville) }}
+            {{ form_row(form.capacite) }}
+            <div class="mt-4 d-flex gap-2">
+                <button type="submit" class="buy-btn flex-fill" style="padding:12px;">
+                    <i class="bi bi-check-circle"></i> Enregistrer
+                </button>
+                <a href="{{ path('app_lieu_index') }}" class="btn btn-outline-secondary flex-fill" style="padding:12px;">
+                    Annuler
+                </a>
+            </div>
+            {{ form_end(form) }}
+        </div>
+    </div>
+</div>
+</div>
+</div>
+</section>
+
+{% endblock %}

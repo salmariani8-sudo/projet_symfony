@@ -1,0 +1,170 @@
+{% extends 'base.html.twig' %}
+{% block title %}Accueil — EventSpot{% endblock %}
+{% block body_class %}index-page{% endblock %}
+
+{% block body %}
+
+<!-- ===== HERO ===== -->
+<section id="hero" class="hero section dark-background">
+    <img src="{{ asset('theevent/assets/img/hero-bg.jpg') }}" alt="" data-aos="fade-in">
+
+    <div class="container d-flex flex-column align-items-center text-center mt-auto">
+        <h2 data-aos="fade-up" data-aos-delay="100">
+            BIENVENUE SUR<br><span>EVENTSPOT</span>
+        </h2>
+        <p data-aos="fade-up" data-aos-delay="200">
+            Découvrez et rejoignez les meilleurs événements près de chez vous
+        </p>
+        <div data-aos="fade-up" data-aos-delay="300">
+            <a href="{{ path('app_evenement_index') }}" class="buy-btn mt-3">
+                Voir tous les événements
+            </a>
+        </div>
+    </div>
+
+    <div class="about-info mt-auto position-relative">
+        <div class="container position-relative" data-aos="fade-up">
+            <div class="row">
+                <div class="col-lg-6">
+                    <h2>À propos d'EventSpot</h2>
+                    <p>EventSpot est votre plateforme de référence pour découvrir, créer et rejoindre des événements exceptionnels. Conférences, ateliers, concerts, meetups — trouvez l'événement qui vous correspond.</p>
+                </div>
+                <div class="col-lg-3">
+                    <h3>Pour qui ?</h3>
+                    <p>Participants, organisateurs et professionnels passionnés par les événements.</p>
+                </div>
+                <div class="col-lg-3">
+                    <h3>Comment ?</h3>
+                    <p>Créez un compte, parcourez les événements et inscrivez-vous en un clic.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- ===== PROCHAINS ÉVÉNEMENTS ===== -->
+<section id="evenements" class="schedule section">
+    <div class="container section-title" data-aos="fade-up">
+        <h2>Prochains Événements</h2>
+        <p>Les événements à ne pas manquer</p>
+    </div>
+
+    <div class="container">
+        <div class="row gy-4">
+            {% for e in evenements %}
+            <div class="col-xl-4 col-md-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+                <div class="es-card card h-100">
+                    {% if e.imageName %}
+                        <img src="{{ asset('uploads/evenements/' ~ e.imageName) }}"
+                             class="es-card-img" alt="{{ e.titre }}">
+                    {% else %}
+                        <div class="es-placeholder">
+                            {% if e.categorie == 'concert' %}🎵
+                            {% elseif e.categorie == 'conference' %}🎤
+                            {% elseif e.categorie == 'atelier' %}🔧
+                            {% elseif e.categorie == 'meetup' %}👥
+                            {% else %}📚{% endif %}
+                        </div>
+                    {% endif %}
+                    <div class="card-body p-4">
+                        <div class="mb-2">
+                            <span class="badge text-white" style="background:var(--accent-color,#f82249); font-size:11px; padding:4px 12px; border-radius:20px;">
+                                {% if e.categorie == 'concert' %}🎵 Concert
+                                {% elseif e.categorie == 'conference' %}🎤 Conférence
+                                {% elseif e.categorie == 'atelier' %}🔧 Atelier
+                                {% elseif e.categorie == 'meetup' %}👥 Meetup
+                                {% else %}📚 Formation{% endif %}
+                            </span>
+                        </div>
+                        <h5 class="card-title fw-bold mb-2">{{ e.titre }}</h5>
+                        <p class="text-muted small mb-1">
+                            <i class="bi bi-calendar3"></i>
+                            {{ e.dateDebut ? e.dateDebut|date('d/m/Y') : '-' }}
+                        </p>
+                        <p class="text-muted small mb-2">
+                            <i class="bi bi-geo-alt"></i>
+                            {{ e.lieu ? e.lieu.ville : '-' }}
+                        </p>
+                        <div class="mb-3">
+                            {% for tag in e.tags %}
+                                <span class="badge-tag" style="background-color:{{ tag.couleur }};">{{ tag.nom }}</span>
+                            {% endfor %}
+                        </div>
+                        <p class="fw-bold" style="color:var(--accent-color,#f82249);">
+                            {{ e.prix|price_format }}
+                        </p>
+                    </div>
+                    <div class="card-footer bg-transparent border-0 pb-4 px-4">
+                        <a href="{{ path('app_evenement_show', {id: e.id}) }}" class="buy-btn w-100 text-center d-block">
+                            Voir les détails
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% else %}
+            <div class="col-12 text-center py-5 text-muted">
+                Aucun événement à venir pour le moment.
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="text-center mt-5" data-aos="fade-up">
+            <a href="{{ path('app_evenement_index') }}" class="buy-btn">
+                Tous les événements &rarr;
+            </a>
+        </div>
+    </div>
+</section>
+
+<!-- ===== RÉCEMMENT CONSULTÉS — variable "historique" depuis le contrôleur ===== -->
+{% if historique is defined and historique|length > 0 %}
+<section class="sponsors section light-background">
+    <div class="container section-title" data-aos="fade-up">
+        <h2>📋 Récemment consultés</h2>
+        <p>Les événements que vous avez consultés récemment</p>
+    </div>
+    <div class="container" data-aos="fade-up" data-aos-delay="100">
+        <div class="row gy-3">
+            {% for e in historique %}
+            <div class="col-lg-4 col-md-6">
+                <div class="d-flex align-items-center gap-3 p-3 bg-white rounded shadow-sm">
+                    <div style="font-size:2rem; width:50px; text-align:center;">
+                        {% if e.categorie == 'concert' %}🎵
+                        {% elseif e.categorie == 'conference' %}🎤
+                        {% elseif e.categorie == 'atelier' %}🔧
+                        {% elseif e.categorie == 'meetup' %}👥
+                        {% else %}📚{% endif %}
+                    </div>
+                    <div>
+                        <h6 class="mb-0 fw-bold">{{ e.titre }}</h6>
+                        <small class="text-muted">{{ e.dateDebut ? e.dateDebut|date('d/m/Y') : '-' }}</small><br>
+                        <a href="{{ path('app_evenement_show', {id: e.id}) }}"
+                           style="color:var(--accent-color,#f82249); font-size:13px;">
+                            Revoir →
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- ===== BANNIÈRE INSCRIPTION ===== -->
+<section class="buy-tickets section light-background">
+    <div class="container section-title" data-aos="fade-up">
+        <h2>Rejoignez EventSpot</h2>
+        <p>Inscrivez-vous gratuitement et ne manquez plus aucun événement</p>
+    </div>
+    <div class="container text-center" data-aos="fade-up" data-aos-delay="100">
+        {% if not app.user %}
+            <a href="{{ path('app_register') }}" class="buy-btn me-3">Créer un compte</a>
+            <a href="{{ path('app_login') }}" class="buy-btn" style="background:transparent; border:2px solid var(--accent-color,#f82249); color:var(--accent-color,#f82249);">Se connecter</a>
+        {% else %}
+            <a href="{{ path('app_evenement_index') }}" class="buy-btn">Parcourir les événements</a>
+        {% endif %}
+    </div>
+</section>
+
+{% endblock %}

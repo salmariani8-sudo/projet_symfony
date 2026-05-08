@@ -1,0 +1,52 @@
+{% extends 'base.html.twig' %}
+{% block title %}Tags — EventSpot{% endblock %}
+
+{% block body %}
+
+<div class="es-page-header">
+    <div class="container">
+        <h1><i class="bi bi-tags"></i> Tags</h1>
+        <p>Gérez les tags des événements</p>
+    </div>
+</div>
+
+<section class="es-section">
+<div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <p class="text-muted mb-0"><strong>{{ tags|length }}</strong> tag(s) disponible(s)</p>
+        <a href="{{ path('app_tag_new') }}" class="buy-btn">
+            <i class="bi bi-plus-circle"></i> Nouveau tag
+        </a>
+    </div>
+
+    <div class="row gy-3">
+        {% for tag in tags %}
+        <div class="col-lg-3 col-md-4 col-6" data-aos="fade-up" data-aos-delay="{{ loop.index * 50 }}">
+            <div class="es-card card text-center p-3 h-100">
+                <div style="width:50px; height:50px; background:{{ tag.couleur }}; border-radius:50%; margin:0 auto 12px; display:flex; align-items:center; justify-content:center;">
+                    <i class="bi bi-tag-fill text-white"></i>
+                </div>
+                <h6 class="fw-bold mb-1">{{ tag.nom }}</h6>
+                <small class="text-muted d-block mb-3">{{ tag.couleur }}</small>
+                <form method="post" action="{{ path('app_tag_delete', {id: tag.id}) }}"
+                      onsubmit="return confirm('Supprimer le tag {{ tag.nom }} ?')">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tag.id) }}">
+                    <button type="submit" class="btn btn-outline-danger btn-sm">
+                        <i class="bi bi-trash"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+        {% else %}
+        <div class="col-12 text-center text-muted py-5">
+            <i class="bi bi-tags fs-1 d-block mb-2"></i>
+            Aucun tag créé.
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+</section>
+
+{% endblock %}

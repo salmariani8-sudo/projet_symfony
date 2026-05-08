@@ -1,0 +1,59 @@
+{% extends 'base.html.twig' %}
+{% block title %}S'inscrire — {{ evenement.titre }}{% endblock %}
+
+{% block body %}
+
+<div class="es-page-header">
+    <div class="container">
+        <h1><i class="bi bi-ticket-perforated"></i> Inscription</h1>
+        <p>{{ evenement.titre }}</p>
+    </div>
+</div>
+
+<section class="es-section">
+<div class="container">
+<div class="row justify-content-center">
+<div class="col-lg-6" data-aos="fade-up">
+
+    <!-- Résumé de l'événement -->
+    <div class="card border-0 shadow-sm rounded-3 mb-4" style="background:linear-gradient(135deg,var(--heading-color,#2c2c2c),#444); color:#fff;">
+        <div class="card-body p-4">
+            <h5 class="fw-bold">{{ evenement.titre }}</h5>
+            <p class="mb-1 opacity-75">
+                <i class="bi bi-calendar3"></i>
+                {{ evenement.dateDebut ? evenement.dateDebut|date('d/m/Y H:i') : '-' }}
+            </p>
+            <p class="mb-1 opacity-75">
+                <i class="bi bi-geo-alt"></i>
+                {{ evenement.lieu ? evenement.lieu.nom ~ ', ' ~ evenement.lieu.ville : '-' }}
+            </p>
+            <p class="mb-0 fw-bold" style="color:var(--accent-color,#f82249); font-size:1.2rem;">
+                {{ evenement.prix|price_format }}
+            </p>
+        </div>
+    </div>
+
+    <div class="es-card card">
+        <div class="card-body p-4">
+            <h5 class="fw-bold mb-4">Confirmer votre inscription</h5>
+            {{ form_start(form) }}
+            {{ form_row(form.commentaire) }}
+            <button type="submit" class="buy-btn w-100" style="padding:14px;">
+                <i class="bi bi-check-circle"></i> Confirmer l'inscription
+            </button>
+            {{ form_end(form) }}
+        </div>
+    </div>
+
+    <div class="text-center mt-3">
+        <a href="{{ path('app_evenement_show', {id: evenement.id}) }}"
+           style="color:var(--accent-color,#f82249);">
+            ← Retour à l'événement
+        </a>
+    </div>
+</div>
+</div>
+</div>
+</section>
+
+{% endblock %}

@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    {{ importmap('app') }}
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>{% block title %}EventSpot{% endblock %}</title>
+    <meta name="description" content="">
+
+    <!-- Favicons -->
+    <link href="{{ asset('theevent/assets/img/favicon.png') }}" rel="icon">
+    <link href="{{ asset('theevent/assets/img/apple-touch-icon.png') }}" rel="apple-touch-icon">
+
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Raleway:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Vendor CSS -->
+    <link href="{{ asset('theevent/assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('theevent/assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('theevent/assets/vendor/aos/aos.css') }}" rel="stylesheet">
+    <link href="{{ asset('theevent/assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('theevent/assets/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
+
+    <!-- Main CSS -->
+    <link href="{{ asset('theevent/assets/css/main.css') }}" rel="stylesheet">
+
+    <style>
+        /* EventSpot overrides */
+        .es-flash-zone { position: fixed; top: 80px; right: 20px; z-index: 9999; min-width: 320px; }
+        .badge-tag { display: inline-block; padding: 3px 10px; border-radius: 20px; color: #fff; font-size: 11px; margin: 2px; font-weight: 500; }
+        .es-page-header { background: linear-gradient(rgba(0,0,0,.7), rgba(0,0,0,.7)), url('{{ asset('theevent/assets/img/hero-bg.jpg') }}') center/cover; padding: 80px 0 50px; margin-top: 72px; }
+        .es-page-header h1 { color: #fff; font-family: 'Raleway', sans-serif; font-weight: 800; }
+        .es-page-header p { color: rgba(255,255,255,.8); }
+        .es-section { padding: 60px 0; }
+        .es-card { border: none; border-radius: 10px; overflow: hidden; box-shadow: 0 4px 20px rgba(0,0,0,.08); transition: transform .25s, box-shadow .25s; }
+        .es-card:hover { transform: translateY(-5px); box-shadow: 0 10px 30px rgba(0,0,0,.15); }
+        .es-card-img { height: 200px; object-fit: cover; width: 100%; }
+        .es-placeholder { height: 200px; display: flex; align-items: center; justify-content: center; font-size: 3rem; background: #f4f4f4; }
+        .buy-btn { background: var(--accent-color, #f82249); color: #fff; border: none; border-radius: 5px; padding: 10px 28px; font-weight: 600; text-decoration: none; display: inline-block; transition: background .2s; }
+        .buy-btn:hover { background: #d01a3a; color: #fff; }
+        body:not(.index-page) .main { margin-top: 72px; }
+    </style>
+
+    {% block stylesheets %}{% endblock %}
+</head>
+
+<body class="{% block body_class %}inner-page{% endblock %}">
+
+    <!-- ===== HEADER ===== -->
+    <header id="header" class="header d-flex align-items-center fixed-top">
+        <div class="container-fluid container-xl position-relative d-flex align-items-center">
+
+            <a href="{{ path('app_home') }}" class="logo d-flex align-items-center me-auto">
+                <span class="sitename">Event<span style="color:var(--accent-color,#f82249);">Spot</span></span>
+            </a>
+
+            <nav id="navmenu" class="navmenu">
+                <ul>
+                    <li><a href="{{ path('app_home') }}">Accueil</a></li>
+                    <li><a href="{{ path('app_evenement_index') }}">Événements</a></li>
+                    {% if is_granted('ROLE_ORGANISATEUR') %}
+                        <li><a href="{{ path('app_lieu_index') }}">Lieux</a></li>
+                    {% endif %}
+                    {% if is_granted('ROLE_ADMIN') %}
+                        <li><a href="{{ path('app_tag_index') }}">Tags</a></li>
+                    {% endif %}
+                    {% if app.user %}
+                        <li class="dropdown">
+                            <a href="#"><span><i class="bi bi-person-circle"></i> {{ app.user.pseudo }}</span>
+                                <i class="bi bi-chevron-down toggle-dropdown"></i>
+                            </a>
+                            <ul>
+                                {% if is_granted('ROLE_ORGANISATEUR') %}
+                                    <li><a href="{{ path('app_evenement_new') }}"><i class="bi bi-plus-circle"></i> Créer un événement</a></li>
+                                {% endif %}
+                                <li><a href="{{ path('app_logout') }}"><i class="bi bi-box-arrow-right"></i> Déconnexion</a></li>
+                            </ul>
+                        </li>
+                    {% else %}
+                        <li><a href="{{ path('app_login') }}">Connexion</a></li>
+                    {% endif %}
+                </ul>
+                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+            </nav>
+
+            {% if not app.user %}
+                <a class="cta-btn d-none d-sm-block" href="{{ path('app_register') }}">S'inscrire</a>
+            {% elseif is_granted('ROLE_ORGANISATEUR') %}
+                <a class="cta-btn d-none d-sm-block" href="{{ path('app_evenement_new') }}">+ Créer</a>
+            {% endif %}
+        </div>
+    </header>
+    <!-- ===== END HEADER ===== -->
+
+    <!-- ===== FLASH MESSAGES ===== -->
+    <div class="es-flash-zone">
+        {% for type, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ type == 'success' ? 'success' : (type == 'danger' ? 'danger' : 'info') }} alert-dismissible fade show shadow-sm" role="alert" style="border-radius:8px;">
+                    {% if type == 'success' %}<i class="bi bi-check-circle-fill me-2"></i>
+                    {% elseif type == 'danger' %}<i class="bi bi-exclamation-triangle-fill me-2"></i>
+                    {% else %}<i class="bi bi-info-circle-fill me-2"></i>{% endif %}
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+    </div>
+
+    <main class="main">
+        {% block body %}{% endblock %}
+    </main>
+
+    <!-- ===== FOOTER ===== -->
+    <footer id="footer" class="footer dark-background">
+        <div class="footer-top">
+            <div class="container">
+                <div class="row gy-4">
+                    <div class="col-lg-4 col-md-6 footer-about">
+                        <a href="{{ path('app_home') }}" class="logo d-flex align-items-center">
+                            <span class="sitename">EventSpot</span>
+                        </a>
+                        <div class="footer-contact pt-3">
+                            <p>Découvrez et rejoignez les meilleurs événements.</p>
+                            <p class="mt-3"><strong>Email:</strong> <span>contact@eventspot.com</span></p>
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3 footer-links">
+                        <h4>Navigation</h4>
+                        <ul>
+                            <li><a href="{{ path('app_home') }}">Accueil</a></li>
+                            <li><a href="{{ path('app_evenement_index') }}">Événements</a></li>
+                            <li><a href="{{ path('app_lieu_index') }}">Lieux</a></li>
+                        </ul>
+                    </div>
+                    <div class="col-lg-2 col-md-3 footer-links">
+                        <h4>Compte</h4>
+                        <ul>
+                            {% if app.user %}
+                                {% if is_granted('ROLE_ORGANISATEUR') %}
+                                    <li><a href="{{ path('app_evenement_new') }}">Créer un événement</a></li>
+                                {% endif %}
+                                <li><a href="{{ path('app_logout') }}">Déconnexion</a></li>
+                            {% else %}
+                                <li><a href="{{ path('app_login') }}">Connexion</a></li>
+                                <li><a href="{{ path('app_register') }}">S'inscrire</a></li>
+                            {% endif %}
+                        </ul>
+                    </div>
+                    <div class="col-lg-4 col-md-6 footer-links">
+                        <h4>Catégories</h4>
+                        <ul>
+                            <li><a href="{{ path('app_evenement_index', {categorie: 'conference'}) }}">🎤 Conférences</a></li>
+                            <li><a href="{{ path('app_evenement_index', {categorie: 'atelier'}) }}">🔧 Ateliers</a></li>
+                            <li><a href="{{ path('app_evenement_index', {categorie: 'meetup'}) }}">👥 Meetups</a></li>
+                            <li><a href="{{ path('app_evenement_index', {categorie: 'concert'}) }}">🎵 Concerts</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="copyright text-center">
+            <div class="container d-flex flex-column flex-lg-row justify-content-center justify-content-lg-between align-items-center">
+                <div>
+                    &copy; {{ "now"|date("Y") }} <strong>EventSpot</strong>. Tous droits réservés.
+                </div>
+                <div class="social-links order-first order-lg-last mb-3 mb-lg-0">
+                    <a href="#"><i class="bi bi-twitter-x"></i></a>
+                    <a href="#"><i class="bi bi-facebook"></i></a>
+                    <a href="#"><i class="bi bi-instagram"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+    <!-- ===== END FOOTER ===== -->
+
+    <!-- Scroll Top -->
+    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center">
+        <i class="bi bi-arrow-up-short"></i>
+    </a>
+
+    <!-- Preloader -->
+    <div id="preloader"></div>
+
+    <!-- Vendor JS -->
+    <script src="{{ asset('theevent/assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('theevent/assets/vendor/aos/aos.js') }}"></script>
+    <script src="{{ asset('theevent/assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ asset('theevent/assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
+
+    <!-- Main JS -->
+    <script src="{{ asset('theevent/assets/js/main.js') }}"></script>
+
+    {% block javascripts %}{% endblock %}
+</body>
+</html>

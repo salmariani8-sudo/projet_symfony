@@ -1,0 +1,14 @@
+parameters:
+    upload_directory: '%kernel.project_dir%/public/uploads/evenements'
+
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    App\:
+        resource: '../src/'
+
+    App\Service\FileUploader:
+        arguments:
+            $targetDirectory: '%upload_directory%'
